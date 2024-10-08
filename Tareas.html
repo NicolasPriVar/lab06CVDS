@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Tareas</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: #fefefe;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            width: 400px;
+        }
+
+        h1 {
+            font-size: 24px;
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        #task-form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #task-input, #task-desc, #task-priority, #task-difficulty {
+            width: 80%;
+            padding: 10px;
+            border: 1px solid #000000;
+            border-radius: 5px;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        button {
+            background-color: #2ba8e2;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #000000;
+        }
+
+        #task-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 20px;
+        }
+
+        #task-list li {
+            padding: 12px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: background-color 0.3s ease;
+        }
+
+        #task-list li:hover {
+            background-color: #f1f1f1;
+        }
+
+        .remove-task, .edit-task {
+            cursor: pointer;
+            font-weight: bold;
+            margin-left: 10px;
+            transition: color 0.3s ease;
+        }
+
+        .remove-task:hover {
+            color: #d12626;
+        }
+
+        .edit-task:hover {
+            color: #2ba8e2;
+        }
+
+        .task-text, .task-desc {
+            display: inline-block;
+            margin-left: 10px;
+            font-weight: bold;
+        }
+
+        .task-desc {
+            font-weight: normal;
+            color: #555;
+            margin-left: 20px;
+        }
+
+        .completed {
+            text-decoration: line-through;
+            color: #aaa;
+        }
+
+        .checkbox {
+            cursor: pointer;
+        }
+
+        .task-info {
+            display: flex;
+            align-items: center;
+            flex-grow: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Lista de Tareas</h1>
+
+        <!-- Formulario para añadir tareas -->
+        <form id="task-form">
+            <input type="text" id="task-input" placeholder="Nombre de la tarea" required>
+            <textarea id="task-desc" placeholder="Descripción de la tarea" required></textarea>
+            
+            <!-- Campo para nivel de dificultad -->
+            <select id="task-difficulty" required>
+                <option value="">Seleccione nivel de dificultad</option>
+                <option value="Baja">Baja</option>
+                <option value="Media">Media</option>
+                <option value="Alta">Alta</option>
+            </select>
+            
+            <!-- Campo para prioridad -->
+            <input type="number" id="task-priority" placeholder="Prioridad (1 a 5)" min="1" max="5" required>
+
+            <button type="submit">Añadir</button>
+        </form>
+
+        <!-- Lista de tareas -->
+        <ul id="task-list">
+            <!-- Las tareas aparecerán aquí -->
+        </ul>
+    </div>
+
+    <script>
+        // Obtener elementos del DOM
+        const taskForm = document.getElementById('task-form'); 
+        const taskInput = document.getElementById('task-input');
+        const taskDesc = document.getElementById('task-desc');
+        const taskDifficulty = document.getElementById('task-difficulty'); // Nuevo campo para dificultad
+        const taskPriority = document.getElementById('task-priority'); // Nuevo campo para prioridad
+        const taskList = document.getElementById('task-list');
+
+        // Función para cargar todas las tareas desde el backend al iniciar la página
+        function cargarTareas() {
+            fetch("http://localhost:8081/api/tareas") 
+                .then(response => response.json()) 
+                .then(tareas => {
+                    tareas.forEach(tarea => { 
+                        const li = document.createElement('li'); 
+                        li.dataset.taskId = tarea.id; 
+    
+                        const checkbox = document.createElement('input');
+                        checkbox.type = 'checkbox';
+                        checkbox.classList.add('checkbox');
+                        checkbox.checked = tarea.completada; 
+    
+                        const taskInfo = document.createElement('div');
+                        taskInfo.classList.add('task-info');
+    
+                        const taskSpan = document.createElement('span');
+                        taskSpan.classList.add('task-text');
+                        taskSpan.textContent = tarea.nombre;
+    
+                        if (tarea.completada) {
+                            taskSpan.classList.add('completed');
+                        }
+    
+                        const taskDescSpan = document.createElement('span');
+                        taskDescSpan.classList.add('task-desc');
+                        taskDescSpan.textContent = tarea.descripcion;
+
+                        // Mostrar nivel de dificultad y prioridad
+                        const taskDifficultySpan = document.createElement('span');
+                        taskDifficultySpan.textContent = `Dificultad: ${tarea.nivelDificultad}`;
+
+                        const taskPrioritySpan = document.createElement('span');
+                        taskPrioritySpan.textContent = `Prioridad: ${tarea.prioridad}`;
+    
+                        const editBtn = document.createElement('span');
+                        editBtn.classList.add('edit-task');
+                        editBtn.textContent = 'Editar';
+    
+                        const removeBtn = document.createElement('span');
+                        removeBtn.classList.add('remove-task');
+                        removeBtn.textContent = 'x';
+    
+                        taskInfo.appendChild(taskSpan);
+                        taskInfo.appendChild(taskDescSpan);
+                        taskInfo.appendChild(taskDifficultySpan);
+                        taskInfo.appendChild(taskPrioritySpan);
+    
+                        li.appendChild(checkbox);
+                        li.appendChild(taskInfo);
+                        li.appendChild(editBtn);
+                        li.appendChild(removeBtn);
+    
+                        taskList.appendChild(li);
+                    });
+                })
+                .catch(error => {
+                    console.error("Error al cargar tareas:", error);
+                });
+        }
+    
+        window.onload = cargarTareas;
+    
+        taskForm.addEventListener('submit', function (e) {
+            e.preventDefault(); 
+    
+            const newTask = taskInput.value.trim(); 
+            const newDesc = taskDesc.value.trim(); 
+            const newDifficulty = taskDifficulty.value; 
+            const newPriority = taskPriority.value;
+    
+            if (newTask !== '' && newDesc !== '' && newDifficulty !== '' && newPriority !== '') {
+                const taskData = {
+                    nombre: newTask,
+                    descripcion: newDesc,
+                    nivelDificultad: newDifficulty,
+                    prioridad: newPriority
+                };
+    
+                fetch("http://localhost:8081/api/tareas", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json", 
+                    },
+                    body: JSON.stringify(taskData), 
+                })
+                .then(response => response.json())
+                .then(data => {
+                    const li = document.createElement('li'); 
+                    li.dataset.taskId = data.id;
+    
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.classList.add('checkbox');
+    
+                    const taskInfo = document.createElement('div');
+                    taskInfo.classList.add('task-info');
+    
+                    const taskSpan = document.createElement('span');
+                    taskSpan.classList.add('task-text');
+                    taskSpan.textContent = newTask;
+    
+                    const taskDescSpan = document.createElement('span');
+                    taskDescSpan.classList.add('task-desc');
+                    taskDescSpan.textContent = newDesc;
+
+                    const taskDifficultySpan = document.createElement('span');
+                    taskDifficultySpan.textContent = `Dificultad: ${newDifficulty}`;
+
+                    const taskPrioritySpan = document.createElement('span');
+                    taskPrioritySpan.textContent = `Prioridad: ${newPriority}`;
+    
+                    const editBtn = document.createElement('span');
+                    editBtn.classList.add('edit-task');
+                    editBtn.textContent = 'Editar';
+    
+                    const removeBtn = document.createElement('span');
+                    removeBtn.classList.add('remove-task');
+                    removeBtn.textContent = 'x';
+    
+                    taskInfo.appendChild(taskSpan);
+                    taskInfo.appendChild(taskDescSpan);
+                    taskInfo.appendChild(taskDifficultySpan);
+                    taskInfo.appendChild(taskPrioritySpan);
+    
+                    li.appendChild(checkbox);
+                    li.appendChild(taskInfo);
+                    li.appendChild(editBtn);
+                    li.appendChild(removeBtn);
+    
+                    taskList.appendChild(li);
+    
+                    taskInput.value = ''; 
+                    taskDesc.value = ''; 
+                    taskDifficulty.value = ''; 
+                    taskPriority.value = ''; 
+                })
+                .catch(error => {
+                    console.error("Error al crear tarea:", error);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
