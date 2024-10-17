@@ -3,6 +3,13 @@ import '../style.css';
 
 function ListaDeTareas() {
     const [tasks, setTasks] = useState([]);
+    const [editTask, setEditTask] = useState(null); // Estado para la tarea que se va a editar
+    const [formData, setFormData] = useState({
+        nombre: '',
+        descripcion: '',
+        dificultad: '',
+        prioridad: '',
+    });
 
     useEffect(() => {
         cargarTareas();
@@ -73,12 +80,43 @@ function ListaDeTareas() {
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ completada: !completada }), // Cambia solo el estado de completada
+            body: JSON.stringify({ completada: !completada }), 
         })
         .then(updatedTask => updatedTask.json())
         .then(updatedTask => {
-            let newTasks = tasks.map(tarea => tarea.id === id ? updatedTask : tarea)
-            setTasks(newTasks);
+            setTasks(tasks.map(tarea => tarea.id === id ? updatedTask : tarea));
+        })
+        .catch(error => {
+            console.error("Error al actualizar tarea:", error);
+        });
+    };
+
+    const handleEditTask = (tarea) => {
+        setEditTask(tarea.id);
+        setFormData({
+            nombre: tarea.nombre,
+            descripcion: tarea.descripcion,
+            dificultad: tarea.dificultad,
+            prioridad: tarea.prioridad,
+        });
+    };
+
+    const handleUpdateTask = (e) => {
+        e.preventDefault();
+        const updatedTaskData = { ...formData, completada: false };
+
+        fetch(`http://localhost:8081/api/tareas/${editTask}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(updatedTaskData),
+        })
+        .then(response => response.json())
+        .then(updatedTask => {
+            setTasks(tasks.map(tarea => tarea.id === editTask ? updatedTask : tarea));
+            setEditTask(null); // Restablecer el estado de edición
+            setFormData({ nombre: '', descripcion: '', dificultad: '', prioridad: '' }); // Limpiar datos del formulario
         })
         .catch(error => {
             console.error("Error al actualizar tarea:", error);
@@ -107,6 +145,45 @@ function ListaDeTareas() {
                 <button type="submit">Añadir Tarea</button>
             </form>
 
+            {editTask && (
+                <form id="edit-task-form" onSubmit={handleUpdateTask}>
+                    <input 
+                        type="text" 
+                        value={formData.nombre} 
+                        onChange={(e) => setFormData({ ...formData, nombre: e.target.value })} 
+                        placeholder="Nombre de la tarea" 
+                        required 
+                    />
+                    <textarea 
+                        value={formData.descripcion} 
+                        onChange={(e) => setFormData({ ...formData, descripcion: e.target.value })} 
+                        placeholder="Descripción" 
+                        required 
+                    />
+                    <select 
+                        value={formData.dificultad} 
+                        onChange={(e) => setFormData({ ...formData, dificultad: e.target.value })} 
+                        required>
+                        <option value="">Selecciona Dificultad</option>
+                        <option value="Baja">Baja</option>
+                        <option value="Media">Media</option>
+                        <option value="Alta">Alta</option>
+                    </select>
+                    <select 
+                        value={formData.prioridad} 
+                        onChange={(e) => setFormData({ ...formData, prioridad: e.target.value })} 
+                        required>
+                        <option value="">Selecciona Prioridad</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                    </select>
+                    <button type="submit">Actualizar Tarea</button>
+                </form>
+            )}
+
             <ul id="task-list">
                 {tasks.map(tarea => (
                     <li key={tarea.id} data-task-id={tarea.id}>
@@ -128,7 +205,9 @@ function ListaDeTareas() {
                         <div className="Prioridad">
                             <span>Prioridad: {tarea.prioridad}</span>
                         </div>
-                        <span className="edit-task">Editar</span>
+                        {!tarea.completada && (
+                            <span className="edit-task" onClick={() => handleEditTask(tarea)}>Editar</span>
+                        )}
                         <span className="remove-task" onClick={() => handleDeleteTask(tarea.id)}>x</span>
                     </li>
                 ))}
