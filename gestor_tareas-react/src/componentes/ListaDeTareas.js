@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import '../style.css';
-import '../styleTareas.css';
 
 function ListaDeTareas() {
     const [tasks, setTasks] = useState([]);
