@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import '../style.css';
-import '../styleTareas.css';
 
 function ListaDeTareas() {
     const [tasks, setTasks] = useState([]);
@@ -11,7 +10,8 @@ function ListaDeTareas() {
     }, []);
 
     function cargarTareas() {
-        fetch("http://localhost:8081/api/tareas")
+        const userId = localStorage.getItem('userId'); 
+        fetch(`http://localhost:8081/api/tareas?userId=${userId}`)
             .then(response => response.json())
             .then(tareas => {
                 setTasks(tareas);
@@ -20,6 +20,7 @@ function ListaDeTareas() {
                 console.error("Error al cargar tareas:", error);
             });
     }
+    
 
     const handleAddTask = (e) => {
         e.preventDefault();
