@@ -1,0 +1,120 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f4f9;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    flex-direction: column;
+}
+
+.container {
+    background-color: #fefefe;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    width: 400px;
+}
+
+h1 {
+    font-size: 24px;
+    color: #333;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+#task-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#task-input, #task-desc, #task-priority, #task-difficulty {
+    width: 80%;
+    padding: 10px;
+    border: 1px solid #000000;
+    border-radius: 5px;
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+button {
+    background-color: #2ba8e2;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #000000;
+}
+
+#task-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 20px;
+}
+
+#task-list li {
+    padding: 12px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: background-color 0.3s ease;
+}
+
+#task-list li:hover {
+    background-color: #f1f1f1;
+}
+
+.remove-task, .edit-task {
+    cursor: pointer;
+    font-weight: bold;
+    margin-left: 10px;
+    transition: color 0.3s ease;
+}
+
+.remove-task:hover {
+    color: #d12626;
+}
+
+.edit-task:hover {
+    color: #2ba8e2;
+}
+
+.task-text, .task-desc {
+    display: inline-block;
+    margin-left: 10px;
+    font-weight: bold;
+}
+
+.task-desc {
+    font-weight: normal;
+    color: #555;
+    margin-left: 20px;
+}
+
+.completed {
+    text-decoration: line-through;
+    color: #aaa;
+}
+
+.checkbox {
+    cursor: pointer;
+}
+
+.task-info {
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+}
