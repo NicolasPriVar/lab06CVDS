@@ -19,7 +19,6 @@ function ListaDeTareas() {
                 console.error("Error al cargar tareas:", error);
             });
     }
-    
 
     const handleAddTask = (e) => {
         e.preventDefault();
@@ -34,7 +33,8 @@ function ListaDeTareas() {
                 nombre: newTask,
                 descripcion: newDesc,
                 dificultad: newDifficulty,
-                prioridad: newPriority
+                prioridad: newPriority,
+                completada: false // Inicializa como no completada
             };
 
             fetch("http://localhost:8081/api/tareas", {
@@ -68,16 +68,17 @@ function ListaDeTareas() {
     };
 
     const handleToggleTask = (id, completada) => {
-        fetch(`http://localhost:8081/api/tareas/${id}`, {
+        fetch(`http://localhost:8081/api/tareas/${id}/completar`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ completada: !completada }),
+            body: JSON.stringify({ completada: !completada }), // Cambia solo el estado de completada
         })
-        .then(response => response.json())
+        .then(updatedTask => updatedTask.json())
         .then(updatedTask => {
-            setTasks(tasks.map(tarea => tarea.id === id ? updatedTask : tarea));
+            let newTasks = tasks.map(tarea => tarea.id === id ? updatedTask : tarea)
+            setTasks(newTasks);
         })
         .catch(error => {
             console.error("Error al actualizar tarea:", error);
@@ -116,7 +117,9 @@ function ListaDeTareas() {
                             onChange={() => handleToggleTask(tarea.id, tarea.completada)} 
                         />
                         <div className="task-info">
-                            <span className={`task-text ${tarea.completada ? 'completed' : ''}`}>{tarea.nombre}</span>
+                            <span className={`task-text ${tarea.completada ? 'completed' : ''}`}>
+                                {tarea.nombre}
+                            </span>
                             <span className="task-desc">{tarea.descripcion}</span>
                         </div>
                         <div className="Dificultad">
