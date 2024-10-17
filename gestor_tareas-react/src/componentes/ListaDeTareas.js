@@ -4,7 +4,6 @@ import '../style.css';
 function ListaDeTareas() {
     const [tasks, setTasks] = useState([]);
 
-    // Función para cargar todas las tareas desde el backend al iniciar la página
     useEffect(() => {
         cargarTareas();
     }, []);
@@ -28,7 +27,7 @@ function ListaDeTareas() {
         const newDifficulty = e.target.taskDifficulty.value;
         const newPriority = e.target.taskPriority.value;
 
-        if (newTask !== '' && newDesc !== '' && newDifficulty !== '' && newPriority !== '') {
+        if (newTask && newDesc && newDifficulty && newPriority) {
             const taskData = {
                 nombre: newTask,
                 descripcion: newDesc,
@@ -46,12 +45,41 @@ function ListaDeTareas() {
             .then(response => response.json())
             .then(data => {
                 setTasks([...tasks, data]);
-                e.target.reset(); // Limpiar el formulario
+                e.target.reset();
             })
             .catch(error => {
                 console.error("Error al añadir tarea:", error);
             });
         }
+    };
+
+    const handleDeleteTask = (id) => {
+        fetch(`http://localhost:8081/api/tareas/${id}`, {
+            method: "DELETE",
+        })
+        .then(() => {
+            setTasks(tasks.filter(tarea => tarea.id !== id));
+        })
+        .catch(error => {
+            console.error("Error al eliminar tarea:", error);
+        });
+    };
+
+    const handleToggleTask = (id, completada) => {
+        fetch(`http://localhost:8081/api/tareas/${id}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ completada: !completada }),
+        })
+        .then(response => response.json())
+        .then(updatedTask => {
+            setTasks(tasks.map(tarea => tarea.id === id ? updatedTask : tarea));
+        })
+        .catch(error => {
+            console.error("Error al actualizar tarea:", error);
+        });
     };
 
     return (
@@ -77,7 +105,12 @@ function ListaDeTareas() {
             <ul id="task-list">
                 {tasks.map(tarea => (
                     <li key={tarea.id} data-task-id={tarea.id}>
-                        <input type="checkbox" className="checkbox" checked={tarea.completada} />
+                        <input 
+                            type="checkbox" 
+                            className="checkbox" 
+                            checked={tarea.completada} 
+                            onChange={() => handleToggleTask(tarea.id, tarea.completada)} 
+                        />
                         <div className="task-info">
                             <span className={`task-text ${tarea.completada ? 'completed' : ''}`}>{tarea.nombre}</span>
                             <span className="task-desc">{tarea.descripcion}</span>
@@ -85,7 +118,7 @@ function ListaDeTareas() {
                             <span>Prioridad: {tarea.prioridad}</span>
                         </div>
                         <span className="edit-task">Editar</span>
-                        <span className="remove-task">x</span>
+                        <span className="remove-task" onClick={() => handleDeleteTask(tarea.id)}>x</span>
                     </li>
                 ))}
             </ul>
