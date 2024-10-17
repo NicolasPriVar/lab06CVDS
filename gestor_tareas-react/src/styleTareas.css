@@ -40,7 +40,7 @@ h1 {
 }
 
 button {
-    background-color: #2ba8e2;
+    background-color: #5c79a7;
     color: white;
     padding: 10px 15px;
     border: none;
@@ -89,7 +89,7 @@ button:hover {
 }
 
 .edit-task:hover {
-    color: #2ba8e2;
+    color: #937f79;
 }
 
 .task-text, .task-desc {
