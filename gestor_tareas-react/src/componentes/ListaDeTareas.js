@@ -1,154 +1,97 @@
+import React, { useState, useEffect } from 'react';
 import '../style.css';
 import '../styleTareas.css';
-import React, { useState, useEffect } from 'react';
 
 function ListaDeTareas() {
-  const [tareas, setTareas] = useState([]);
-  const [nuevaTarea, setNuevaTarea] = useState({
-    nombre: '',
-    descripcion: '',
-    dificultad: '',
-    prioridad: '',
-  });
+    const [tasks, setTasks] = useState([]);
 
-  // Cargar tareas desde el backend
-  useEffect(() => {
-    cargarTareas();
-  }, []);
+    // Función para cargar todas las tareas desde el backend al iniciar la página
+    useEffect(() => {
+        cargarTareas();
+    }, []);
 
-  function cargarTareas() {
-    fetch("http://localhost:8081/api/tareas")
-      .then(response => response.json())
-      .then(tareas => {
-        setTareas(tareas); // Actualizar estado con las tareas obtenidas
-      })
-      .catch(error => {
-        console.error("Error al cargar tareas:", error);
-      });
-  }
+    function cargarTareas() {
+        fetch("http://localhost:8081/api/tareas")
+            .then(response => response.json())
+            .then(tareas => {
+                setTasks(tareas);
+            })
+            .catch(error => {
+                console.error("Error al cargar tareas:", error);
+            });
+    }
 
-  // Agregar una nueva tarea
-  function agregarTarea(event) {
-    event.preventDefault();
-    fetch("http://localhost:8081/api/tareas", {
-      method: "POST",
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(nuevaTarea),
-    })
-      .then(response => response.json())
-      .then(tarea => {
-        setTareas([...tareas, tarea]); // Añadir la nueva tarea al estado
-        setNuevaTarea({
-          nombre: '',
-          descripcion: '',
-          dificultad: '',
-          prioridad: '',
-        });
-      })
-      .catch(error => {
-        console.error("Error al añadir tarea:", error);
-      });
-  }
+    const handleAddTask = (e) => {
+        e.preventDefault();
 
-  // Marcar tarea como completada
-  function marcarCompletada(id) {
-    fetch(`http://localhost:8081/api/tareas/${id}/completar`, {
-      method: "PUT",
-    })
-      .then(() => {
-        setTareas(tareas.map(tarea =>
-          tarea.id === id ? { ...tarea, completada: !tarea.completada } : tarea
-        ));
-      })
-      .catch(error => {
-        console.error("Error al completar tarea:", error);
-      });
-  }
+        const newTask = e.target.taskInput.value.trim();
+        const newDesc = e.target.taskDesc.value.trim();
+        const newDifficulty = e.target.taskDifficulty.value;
+        const newPriority = e.target.taskPriority.value;
 
-  // Eliminar tarea
-  function eliminarTarea(id) {
-    fetch(`http://localhost:8081/api/tareas/${id}`, {
-      method: "DELETE",
-    })
-      .then(() => {
-        setTareas(tareas.filter(tarea => tarea.id !== id));
-      })
-      .catch(error => {
-        console.error("Error al eliminar tarea:", error);
-      });
-  }
+        if (newTask !== '' && newDesc !== '' && newDifficulty !== '' && newPriority !== '') {
+            const taskData = {
+                nombre: newTask,
+                descripcion: newDesc,
+                nivelDificultad: newDifficulty,
+                prioridad: newPriority
+            };
 
-  // Editar tarea (en el formulario)
-  function editarTarea(id) {
-    const tarea = tareas.find(t => t.id === id);
-    setNuevaTarea({
-      nombre: tarea.nombre,
-      descripcion: tarea.descripcion,
-      dificultad: tarea.dificultad,
-      prioridad: tarea.prioridad,
-    });
-  }
+            fetch("http://localhost:8081/api/tareas", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(taskData),
+            })
+            .then(response => response.json())
+            .then(data => {
+                setTasks([...tasks, data]);
+                e.target.reset(); // Limpiar el formulario
+            })
+            .catch(error => {
+                console.error("Error al añadir tarea:", error);
+            });
+        }
+    };
 
-  return (
-    <div className="container">
-      <h1>Lista de Tareas</h1>
-      <form id="task-form" onSubmit={agregarTarea}>
-        <input
-          type="text"
-          id="task-input"
-          placeholder="Nombre de la tarea"
-          value={nuevaTarea.nombre}
-          onChange={(e) => setNuevaTarea({ ...nuevaTarea, nombre: e.target.value })}
-        />
-        <input
-          type="text"
-          id="task-desc"
-          placeholder="Descripción"
-          value={nuevaTarea.descripcion}
-          onChange={(e) => setNuevaTarea({ ...nuevaTarea, descripcion: e.target.value })}
-        />
-        <input
-          type="text"
-          id="task-difficulty"
-          placeholder="Dificultad"
-          value={nuevaTarea.dificultad}
-          onChange={(e) => setNuevaTarea({ ...nuevaTarea, dificultad: e.target.value })}
-        />
-        <input
-          type="text"
-          id="task-priority"
-          placeholder="Prioridad"
-          value={nuevaTarea.prioridad}
-          onChange={(e) => setNuevaTarea({ ...nuevaTarea, prioridad: e.target.value })}
-        />
-        <button type="submit">Añadir Tarea</button>
-      </form>
-      <ul id="task-list">
-        {tareas.map(tarea => (
-          <li key={tarea.id} data-task-id={tarea.id}>
-            <input
-              type="checkbox"
-              className="checkbox"
-              checked={tarea.completada}
-              onChange={() => marcarCompletada(tarea.id)}
-            />
-            <div className="task-info">
-              <span className={`task-text ${tarea.completada ? 'completed' : ''}`}>
-                {tarea.nombre}
-              </span>
-              <span className="task-desc">{tarea.descripcion}</span>
-              <span>{`Dificultad: ${tarea.dificultad}`}</span>
-              <span>{`Prioridad: ${tarea.prioridad}`}</span>
-            </div>
-            <span className="edit-task" onClick={() => editarTarea(tarea.id)}>Editar</span>
-            <span className="remove-task" onClick={() => eliminarTarea(tarea.id)}>x</span>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
+    return (
+        <div>
+            <form id="task-form" onSubmit={handleAddTask}>
+                <input type="text" id="task-input" name="taskInput" placeholder="Tarea" required />
+                <textarea id="task-desc" name="taskDesc" placeholder="Descripción" required></textarea>
+                <select id="task-difficulty" name="taskDifficulty" required>
+                    <option value="">Selecciona Dificultad</option>
+                    <option value="1">Fácil</option>
+                    <option value="2">Media</option>
+                    <option value="3">Difícil</option>
+                </select>
+                <select id="task-priority" name="taskPriority" required>
+                    <option value="">Selecciona Prioridad</option>
+                    <option value="Alta">Alta</option>
+                    <option value="Media">Media</option>
+                    <option value="Baja">Baja</option>
+                </select>
+                <button type="submit">Añadir Tarea</button>
+            </form>
+
+            <ul id="task-list">
+                {tasks.map(tarea => (
+                    <li key={tarea.id} data-task-id={tarea.id}>
+                        <input type="checkbox" className="checkbox" checked={tarea.completada} />
+                        <div className="task-info">
+                            <span className={`task-text ${tarea.completada ? 'completed' : ''}`}>{tarea.nombre}</span>
+                            <span className="task-desc">{tarea.descripcion}</span>
+                            <span>Dificultad: {tarea.nivelDificultad}</span>
+                            <span>Prioridad: {tarea.prioridad}</span>
+                        </div>
+                        <span className="edit-task">Editar</span>
+                        <span className="remove-task">x</span>
+                    </li>
+                ))}
+            </ul>
+        </div>
+    );
 }
 
 export default ListaDeTareas;
