@@ -34,7 +34,7 @@ function ListaDeTareas() {
             const taskData = {
                 nombre: newTask,
                 descripcion: newDesc,
-                nivelDificultad: newDifficulty,
+                dificultad: newDifficulty,
                 prioridad: newPriority
             };
 
@@ -63,15 +63,17 @@ function ListaDeTareas() {
                 <textarea id="task-desc" name="taskDesc" placeholder="Descripción" required></textarea>
                 <select id="task-difficulty" name="taskDifficulty" required>
                     <option value="">Selecciona Dificultad</option>
-                    <option value="1">Fácil</option>
-                    <option value="2">Media</option>
-                    <option value="3">Difícil</option>
+                    <option value="Baja">Baja</option>
+                    <option value="Media">Media</option>
+                    <option value="Alta">Alta</option>
                 </select>
                 <select id="task-priority" name="taskPriority" required>
                     <option value="">Selecciona Prioridad</option>
-                    <option value="Alta">Alta</option>
-                    <option value="Media">Media</option>
-                    <option value="Baja">Baja</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
                 </select>
                 <button type="submit">Añadir Tarea</button>
             </form>
@@ -83,7 +85,11 @@ function ListaDeTareas() {
                         <div className="task-info">
                             <span className={`task-text ${tarea.completada ? 'completed' : ''}`}>{tarea.nombre}</span>
                             <span className="task-desc">{tarea.descripcion}</span>
-                            <span>Dificultad: {tarea.nivelDificultad}</span>
+                        </div>
+                        <div className="Dificultad">
+                            <span>Dificultad: {tarea.dificultad}</span>
+                        </div>
+                        <div className="Prioridad">
                             <span>Prioridad: {tarea.prioridad}</span>
                         </div>
                         <span className="edit-task">Editar</span>

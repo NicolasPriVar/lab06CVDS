@@ -13,7 +13,7 @@ body {
     height: 100vh;
 }
 
-.container {  /* Esta clase debe coincidir con el div principal en Auth.js */
+.container {
     display: flex;
     flex-direction: row;
     justify-content: space-around;
@@ -26,6 +26,7 @@ body {
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(255, 0, 0, 0.1);
+    box-shadow: 0 0 10px rgba(83, 30, 30, 0.1);
     width: 45%;
 }
 
@@ -55,6 +56,7 @@ button {
     width: 100%;
     padding: 10px;
     background-color: #1a0bec;
+    background-color: #72b2c0;
     color: white;
     border: none;
     border-radius: 5px;
@@ -63,7 +65,7 @@ button {
 }
 
 button:hover {
-    background-color: #850e0e;
+    background-color: #083ce8;
 }
 
 .form-container p {
