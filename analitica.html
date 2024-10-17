@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gráficos de Tareas</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7fa;
+            color: #333;
+            text-align: center;
+        }
+
+        h1 {
+            margin: 20px 0;
+            color: #4a90e2;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        button {
+            background-color: #4a90e2;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        button:hover {
+            background-color: #357abd;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .chart-container {
+            display: none;
+            width: 90%;
+            max-width: 600px;
+            margin: 20px auto;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Análisis de Tareas</h1>
+    <div class="button-container">
+        <button onclick="showChart('dificultad')">Histograma de Dificultad</button>
+        <button onclick="showChart('finalizadas')">Número de tareas finalizadas por tiempo</button>
+        <button onclick="showChart('promedios')">Promedios de tareas por prioridad</button>
+        <button onclick="showChart('tiempoTotal')">Tiempo total invertido por tareas realizadas</button>
+    </div>
+
+    <div id="dificultad" class="chart-container">
+        <canvas id="chartDificultad"></canvas>
+    </div>
+    <div id="finalizadas" class="chart-container">
+        <canvas id="chartFinalizadas"></canvas>
+    </div>
+    <div id="promedios" class="chart-container">
+        <canvas id="chartPromedios"></canvas>
+    </div>
+    <div id="tiempoTotal" class="chart-container">
+        <canvas id="chartTiempoTotal"></canvas>
+    </div>
+
+    <script>
+        function showChart(chartId) {
+            // Ocultar todos los gráficos
+            document.querySelectorAll('.chart-container').forEach(container => {
+                container.style.display = 'none';
+            });
+            // Mostrar el gráfico correspondiente
+            document.getElementById(chartId).style.display = 'block';
+
+            // Cargar los gráficos (simulación de datos)
+            if (chartId === 'dificultad') {
+                loadDificultadChart();
+            } else if (chartId === 'finalizadas') {
+                loadFinalizadasChart();
+            } else if (chartId === 'promedios') {
+                loadPromediosChart();
+            } else if (chartId === 'tiempoTotal') {
+                loadTiempoTotalChart();
+            }
+        }
+
+        function loadDificultadChart() {
+            const ctx = document.getElementById('chartDificultad').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Alto', 'Medio', 'Bajo'],
+                    datasets: [{
+                        label: 'Tareas por Dificultad',
+                        data: [10, 20, 15], // Reemplazar con datos del backend
+                        backgroundColor: ['#ff6384', '#36a2eb', '#cc65fe']
+                    }]
+                },
+                options: { responsive: true }
+            });
+        }
+
+        function loadFinalizadasChart() {
+            const ctx = document.getElementById('chartFinalizadas').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Enero', 'Febrero', 'Marzo', 'Abril'],
+                    datasets: [{
+                        label: 'Tareas Finalizadas',
+                        data: [5, 12, 8, 10], // Reemplazar con datos del backend
+                        backgroundColor: '#36a2eb',
+                        fill: true
+                    }]
+                },
+                options: { responsive: true }
+            });
+        }
+
+        function loadPromediosChart() {
+            const ctx = document.getElementById('chartPromedios').getContext('2d');
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['Prioridad 1', 'Prioridad 2', 'Prioridad 3', 'Prioridad 4', 'Prioridad 5'],
+                    datasets: [{
+                        label: 'Promedios de Tareas por Prioridad',
+                        data: [3, 7, 5, 2, 8], // Reemplazar con datos del backend
+                        backgroundColor: ['#ff6384', '#36a2eb', '#cc65fe', '#ffce56', '#4bc0c0']
+                    }]
+                },
+                options: { responsive: true }
+            });
+        }
+
+        function loadTiempoTotalChart() {
+            const ctx = document.getElementById('chartTiempoTotal').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Tarea 1', 'Tarea 2', 'Tarea 3', 'Tarea 4'],
+                    datasets: [{
+                        label: 'Tiempo Total Invertido (Horas)',
+                        data: [2, 5, 3, 4], // Reemplazar con datos del backend
+                        backgroundColor: ['#ff6384', '#36a2eb', '#cc65fe', '#ffce56']
+                    }]
+                },
+                options: { responsive: true }
+            });
+        }
+    </script>
+</body>
+</html>

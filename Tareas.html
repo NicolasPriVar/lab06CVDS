@@ -55,6 +55,7 @@
             font-size: 16px;
             cursor: pointer;
             transition: background-color 0.3s ease;
+            margin-top: 10px;
         }
 
         button:hover {
@@ -149,6 +150,9 @@
             <button type="submit">Añadir</button>
         </form>
 
+        <!-- Botón para ir a analítica -->
+        <button id="go-to-analytics">Ver Analítica</button>
+
         <!-- Lista de tareas -->
         <ul id="task-list">
             <!-- Las tareas aparecerán aquí -->
@@ -160,13 +164,19 @@
         const taskForm = document.getElementById('task-form'); 
         const taskInput = document.getElementById('task-input');
         const taskDesc = document.getElementById('task-desc');
-        const taskDifficulty = document.getElementById('task-difficulty'); // Nuevo campo para dificultad
-        const taskPriority = document.getElementById('task-priority'); // Nuevo campo para prioridad
+        const taskDifficulty = document.getElementById('task-difficulty');
+        const taskPriority = document.getElementById('task-priority');
         const taskList = document.getElementById('task-list');
+        const goToAnalyticsButton = document.getElementById('go-to-analytics');
+
+        // Redirigir a la página de analítica cuando se haga clic en el botón
+        goToAnalyticsButton.addEventListener('click', function() {
+            window.location.href = 'analitica.html';
+        });
 
         // Función para cargar todas las tareas desde el backend al iniciar la página
         function cargarTareas() {
-            fetch("http://localhost:8081/api/tareas") 
+            fetch("http://localhost:8081/api/tareas")
                 .then(response => response.json()) 
                 .then(tareas => {
                     tareas.forEach(tarea => { 
@@ -193,7 +203,6 @@
                         taskDescSpan.classList.add('task-desc');
                         taskDescSpan.textContent = tarea.descripcion;
 
-                        // Mostrar nivel de dificultad y prioridad
                         const taskDifficultySpan = document.createElement('span');
                         taskDifficultySpan.textContent = `Dificultad: ${tarea.nivelDificultad}`;
 
@@ -303,7 +312,24 @@
                     taskPriority.value = ''; 
                 })
                 .catch(error => {
-                    console.error("Error al crear tarea:", error);
+                    console.error("Error al añadir tarea:", error);
+                });
+            }
+        });
+    
+        taskList.addEventListener('click', function (e) {
+            if (e.target.classList.contains('remove-task')) {
+                const li = e.target.parentElement; 
+                const taskId = li.dataset.taskId; 
+    
+                fetch(`http://localhost:8081/api/tareas/${taskId}`, {
+                    method: "DELETE",
+                })
+                .then(() => {
+                    taskList.removeChild(li); 
+                })
+                .catch(error => {
+                    console.error("Error al eliminar tarea:", error);
                 });
             }
         });
