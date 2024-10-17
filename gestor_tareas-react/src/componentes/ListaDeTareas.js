@@ -68,7 +68,7 @@ function ListaDeTareas() {
     };
 
     const handleToggleTask = (id, completada) => {
-        fetch(`http://localhost:8081/api/tareas/${id}`, {
+        fetch(`http://localhost:8081/api/tareas/${id}/completar`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
